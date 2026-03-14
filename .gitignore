@@ -1,3 +1,5 @@
 chunks/**.mp4
 storage/**.mp4
 node_modules/**
+/*.mp4
+**.mp4
