@@ -1,9 +1,13 @@
 @echo off
+setlocal EnableDelayedExpansion
 
 set SEGMENT=20
+set CHUNKS_DIR=chunks
+set OUTPUT_DIR=storage
+set BACKGROUND=background.png
 
-mkdir chunks
-mkdir compressed
+if not exist "%CHUNKS_DIR%" mkdir "%CHUNKS_DIR%"
+if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
 echo ==========================
 echo STEP 1: SPLITTING VIDEOS
@@ -17,17 +21,24 @@ for %%F in (*.mp4) do (
     -reset_timestamps 1 ^
     -start_number 1 ^
     -c copy ^
-    "chunks\%%~nF.%%d.mp4"
+    "%CHUNKS_DIR%\%%~nF.%%d.mp4"
 )
 
 echo ==========================
-echo STEP 2: COMPRESSING CHUNKS
-echo (Running in Parallel)
+echo STEP 2: EDITING CHUNKS
 echo ==========================
 
+for %%F in ("%CHUNKS_DIR%\*.mp4") do (
+    echo Editing %%~nxF ...
+    set "TITLE=%%~nF"
+    set "TITLE=!TITLE:\=\\!"
+    set "TITLE=!TITLE:'=\''!"
+    set "TITLE=!TITLE::=\:!"
+    ffmpeg -i "%%F" -loop 1 -i "%BACKGROUND%" -filter_complex "[1:v]scale=1080:1920[bg];[0:v]scale=1400:-2[vid];[bg][vid]overlay=0:500[tmp];[tmp]drawbox=x=0:y=420:w=iw:h=80:color=white@1:t=fill[boxed];[boxed]drawtext=text='!TITLE!':fontcolor=black:borderw=2:bordercolor=black:fontsize=48:x=(w-text_w)/2:y=440" -shortest -c:v libx264 -preset veryfast -crf 18 "%OUTPUT_DIR%\%%~nxF"
+)
 
 echo ==========================
-echo ALL TASKS STARTED
+echo ALL TASKS COMPLETED
 echo ==========================
 
 pause
