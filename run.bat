@@ -34,7 +34,7 @@ for %%F in ("%CHUNKS_DIR%\*.mp4") do (
     set "TITLE=!TITLE:\=\\!"
     set "TITLE=!TITLE:'=\''!"
     set "TITLE=!TITLE::=\:!"
-    ffmpeg -i "%%F" -loop 1 -i "%BACKGROUND%" -filter_complex "[1:v]scale=1080:1920[bg];[0:v]scale=1400:-2[vid];[bg][vid]overlay=0:500[tmp];[tmp]drawbox=x=0:y=420:w=iw:h=80:color=white@1:t=fill[boxed];[boxed]drawtext=text='!TITLE!':fontcolor=black:borderw=2:bordercolor=black:fontsize=48:x=(w-text_w)/2:y=440" -shortest -c:v libx264 -preset veryfast -crf 18 "%OUTPUT_DIR%\%%~nxF"
+    ffmpeg -i "%%F" -loop 1 -i "%BACKGROUND%" -filter_complex "[1:v]scale=1080:1920[bg];[0:v]scale=1400:-2[vid];[bg][vid]overlay=0:500[tmp];[tmp]drawbox=x=0:y=420:w=iw:h=80:color=white@1:t=fill[titlebg];[titlebg]drawtext=text='!TITLE!':fontcolor=black:borderw=2:bordercolor=black:fontsize=48:x=(w-text_w)/2:y=440[withtitle];[withtitle]drawbox=x=0:y=340:w=iw:h=80:color=white@1:t=fill:enable='between(t,15,20)'[commbg];[commbg]drawtext=text='Comment Link to get full video':fontcolor=black:fontsize=40:x=(w-text_w)/2:y=360:enable='between(t,15,20)'" -shortest -c:v libx264 -preset veryfast -crf 18 "%OUTPUT_DIR%\%%~nxF"
 )
 
 echo ==========================
